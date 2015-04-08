@@ -1,5 +1,12 @@
 package com.dev.web;
 
+import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 public class CommonUtils {
 	private static Logger logger = Logger.getLogger(CommonUtils.class);
 
@@ -20,5 +27,25 @@ public class CommonUtils {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static String getWebPageContent(String htmlUrl) {
+		try {
+			Document document = Jsoup.parse(new URL(htmlUrl), 5000);
+			return document.text();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	public static String extractRegexGroup1(String string, String regex) {
+		Matcher matcher = Pattern.compile(regex).matcher(string);
+		if (matcher.find()) {
+			if (matcher.groupCount() > 1) {
+				return matcher.group(1);
+			}
+		}
+		return "";
 	}
 }

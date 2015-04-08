@@ -17,7 +17,7 @@ public class DBUtil {
 	}
 
 	public static void init() {
-		String sql = "CREATE TABLE stock(id int, name  char(10))";
+		String sql = "CREATE TABLE stock(id char(10) primary key, name char(20))";
 		execute(sql);
 	}
 
@@ -71,9 +71,11 @@ public class DBUtil {
 	}
 
 	public static void main(String[] args) {
-		// DBUtil.init();
+		DBUtil.init();
 		// DBUtil.executeQuery("select TABLE_NAME from  INFORMATION_SCHEMA.tables");
-		DBUtil.execute("insert into stock values(600035,'楚天高速')");
+		// DBUtil.execute("insert into stock values(600035,'楚天高速')");
+		// DBUtil.executeQuery("select * from  stock");
+		DBUtil.execute("delete from stock where id='600035'");
 		DBUtil.executeQuery("select * from  stock");
 	}
 

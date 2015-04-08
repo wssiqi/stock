@@ -3,6 +3,7 @@ package com.dev.web;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -31,6 +32,7 @@ public class SinaStock {
 		String newStockUrl = "http://data.eastmoney.com/xg/xg/default.html";
 		String stockCenterUrl = "http://vip.stock.finance.sina.com.cn/q/go.php/vInvestConsult/kind/qgqp/index.phtml?t=sh_a&p=1&num=60";
 		HtmlPage webPage = webClient.getPage(stockCenterUrl);
+		URL url = new URL("");
 		showPageTable(webPage);
 
 		int page = 1;
