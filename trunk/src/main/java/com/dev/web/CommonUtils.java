@@ -31,6 +31,8 @@ public class CommonUtils {
 
 	public static String getWebPageContent(String htmlUrl) {
 		try {
+			System.setProperty("http.proxyHost", "10.144.1.10");
+			System.setProperty("http.proxyPort", "8080");
 			Document document = Jsoup.parse(new URL(htmlUrl), 5000);
 			return document.text();
 		} catch (Exception e) {
