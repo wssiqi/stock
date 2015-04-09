@@ -1,7 +1,6 @@
 package com.dev.web;
 
-import static org.junit.Assert.*;
-
+import java.io.File;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -25,12 +24,19 @@ public class DBUtilTest {
 	@SuppressWarnings("deprecation")
 	@Test
 	public void test() {
-//		DBUtil.execute("CREATE TABLE TEST AS SELECT * FROM CSVREAD('daily-utf8/000001.csv')");
-		SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
-		Session session = factory.openSession();
-		Query query = session.createQuery("select * from test");
-		List list = query.list();
-		System.out.println();
+//		DBUtil.execute("drop table dailyrecordcsv");
+//		SessionFactory factory = new AnnotationConfiguration().configure()
+//				.buildSessionFactory();
+		// Session session = factory.openSession();
+		// Query query = session.createSQLQuery("select * from test");
+		// List list = query.list();
+		// System.out.println();
+		DBTable table = DBUtil.executeQuery("select * from dailyrecordcsv");
+		System.out.println(table);
+		DBUtil.execute("insert into dailyrecordcsv(日期,股票代码,名称,收盘价,最高价,最低价,开盘价,前收盘,涨跌额,涨跌幅,换手率,成交量,成交金额,总市值,流通市值) select * from CSVREAD('daily-utf8/000001.csv')");
+		// DBTable dbTable = new CsvReader(new File("daily-utf8/000001.csv"))
+		// .readDataAsTable();
+		// System.out.println(dbTable);
 	}
 
 }

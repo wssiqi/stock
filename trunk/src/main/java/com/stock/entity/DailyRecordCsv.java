@@ -2,9 +2,17 @@ package com.stock.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
-@Entity(name = "test")
+@Entity
+@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "日期", "股票代码" }) })
 public class DailyRecordCsv {
+	@Id
+	@GeneratedValue
+	private String id;
 	@Column(name = "日期")
 	private String date;
 	@Column(name = "股票代码")

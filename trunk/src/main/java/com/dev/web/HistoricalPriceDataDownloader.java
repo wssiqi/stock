@@ -16,6 +16,11 @@ import java.util.concurrent.Future;
 import org.apache.commons.io.IOUtils;
 
 public class HistoricalPriceDataDownloader {
+
+	public static void main(String[] args) {
+		downloadStockHistory(Stocks.getAllStockId());
+	}
+
 	public static void downloadStockHistory(String stockId) throws Exception {
 		ArrayList<String> stockList = new ArrayList<String>();
 		stockList.add(stockId);
@@ -67,12 +72,11 @@ public class HistoricalPriceDataDownloader {
 			InputStream in = null;
 			OutputStream out = null;
 			try {
-				String currentDate = DateUtils
-						.getCurrentDateGMT8("yyyyMMdd");
+				String currentDate = DateUtils.getCurrentDateGMT8("yyyyMMdd");
 				String csvDownloadUrl = String
 						.format("http://quotes.money.163.com/service/chddata.html?"
 								+ "code=1%s&start=19900101&"
-								+ "end=%s&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;VOTURNOVER;VATURNOVER",
+								+ "end=%s&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP",
 								stockId, currentDate);
 				URL url = new URL(csvDownloadUrl);
 				URLConnection urlConnection = url.openConnection();
