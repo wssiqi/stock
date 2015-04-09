@@ -1,26 +1,21 @@
 package com.dev.web;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.commons.io.IOUtils;
 
-public class StockDailyHistoryDownloader {
+public class HistoricalPriceDataDownloader {
 	public static void downloadStockHistory(String stockId) throws Exception {
 		ArrayList<String> stockList = new ArrayList<String>();
 		stockList.add(stockId);
@@ -72,8 +67,8 @@ public class StockDailyHistoryDownloader {
 			InputStream in = null;
 			OutputStream out = null;
 			try {
-				String currentDate = DateCenter
-						.getCurrentGMT8DateStr("yyyyMMdd");
+				String currentDate = DateUtils
+						.getCurrentDateGMT8("yyyyMMdd");
 				String csvDownloadUrl = String
 						.format("http://quotes.money.163.com/service/chddata.html?"
 								+ "code=1%s&start=19900101&"

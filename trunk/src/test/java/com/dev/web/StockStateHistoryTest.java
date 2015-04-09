@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
+import org.h2.tools.Csv;
 import org.h2.tools.SimpleResultSet;
 import org.junit.After;
 import org.junit.Before;
@@ -38,6 +39,7 @@ public class StockStateHistoryTest {
 		// SimpleResultSet srs = new SimpleResultSet();
 		File file = new File("daily/000001.csv");
 		File outfile = new File("daily-utf8/000001.csv");
+		CommonUtils.mkdirs(outfile);
 		InputStreamReader inReader = new InputStreamReader(new FileInputStream(
 				file), Charset.forName("GBK"));
 		OutputStreamWriter outWriter = new OutputStreamWriter(
@@ -45,9 +47,10 @@ public class StockStateHistoryTest {
 		IOUtils.copy(inReader, outWriter);
 		IOUtils.closeQuietly(inReader);
 		IOUtils.closeQuietly(outWriter);
-		DBTable executeQuery = DBUtil
+//		new Csv().read(reader, colNames)
+		DBTable dbTable = DBUtil
 				.executeQuery("select * from csvread('daily-utf8/000001.csv')");
 		DBUtil.execute("create table daily000001 as select * from csvread('daily-utf8/000001.csv')");
-		System.out.println(executeQuery);
+		System.out.println(dbTable);
 	}
 }
