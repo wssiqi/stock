@@ -1,3 +1,6 @@
 04-08 22:16:32 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLException: Syntax error in SQL statement "SELECT [*]"; expected "TOP, LIMIT, DISTINCT, ALL, *, NOT, EXISTS, INTERSECTS"; SQL statement:
 select [42001-186]
+04-09 10:35:44 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "DAILY000001" not found; SQL statement:
+select * from daily000001 [42102-186]

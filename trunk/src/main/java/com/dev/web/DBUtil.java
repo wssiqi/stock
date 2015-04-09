@@ -3,11 +3,7 @@ package com.dev.web;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DBUtil {
 	static {
@@ -32,7 +28,7 @@ public class DBUtil {
 			statement = connection.createStatement();
 			statement.execute(sql);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new RuntimeException(String.format("执行SQL失败:'%s'", sql), e);
 		} finally {
 			CommonUtils.closeQuietly(statement);
 			CommonUtils.closeQuietly(connection);
@@ -47,7 +43,9 @@ public class DBUtil {
 			connection = DriverManager.getConnection(dbSourceUrl);
 			statement = connection.createStatement();
 			ResultSet resultSet = statement.executeQuery(querySql);
-			return showResultSet(resultSet);
+			DBTable dbTable = new DBTable();
+			dbTable.parseResultSet(resultSet);
+			return dbTable;
 		} catch (Exception e) {
 			throw new RuntimeException(String.format("执行SQL失败:'%s'", querySql),
 					e);
@@ -55,25 +53,6 @@ public class DBUtil {
 			CommonUtils.closeQuietly(statement);
 			CommonUtils.closeQuietly(connection);
 		}
-	}
-
-	private static DBTable showResultSet(ResultSet resultSet)
-			throws SQLException {
-		DBTable dbTable = new DBTable();
-		ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-		int colCnt = resultSetMetaData.getColumnCount();
-		for (int i = 1; i <= colCnt; i++) {
-			dbTable.addColumnName(resultSetMetaData.getColumnLabel(i));
-		}
-		resultSet.beforeFirst();
-		while (resultSet.next()) {
-			List<String> rowDataList = new ArrayList<String>();
-			for (int i = 1; i <= colCnt; i++) {
-				rowDataList.add(resultSet.getString(i));
-			}
-			dbTable.addRowData(rowDataList);
-		}
-		return dbTable;
 	}
 
 	public static void main(String[] args) {

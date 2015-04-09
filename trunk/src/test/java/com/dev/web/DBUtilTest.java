@@ -18,6 +18,7 @@ public class DBUtilTest {
 
 	@Test
 	public void test() {
+		DBUtil.execute("drop table daily000001");
 		DBTable dbtable = DBUtil.executeQuery("select * from daily000001");
 		System.out.println();
 	}

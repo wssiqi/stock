@@ -1,5 +1,7 @@
 package com.dev.web;
 
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,5 +35,31 @@ public class DBTable {
 			columnValues.add(rowData.get(columnIndex));
 		}
 		return columnValues;
+	}
+
+	public void parseResultSet(ResultSet resultSet) {
+		clear();
+		try {
+			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+			int colCnt = resultSetMetaData.getColumnCount();
+			for (int i = 1; i <= colCnt; i++) {
+				addColumnName(resultSetMetaData.getColumnLabel(i));
+			}
+			resultSet.beforeFirst();
+			while (resultSet.next()) {
+				List<String> rowDataList = new ArrayList<String>();
+				for (int i = 1; i <= colCnt; i++) {
+					rowDataList.add(resultSet.getString(i));
+				}
+				addRowData(rowDataList);
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void clear() {
+		columnNameMap.clear();
+		rowList.clear();
 	}
 }
