@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBUtil {
 	static {
@@ -37,7 +39,7 @@ public class DBUtil {
 		}
 	}
 
-	public static void executeQuery(String querySql) {
+	public static DBTable executeQuery(String querySql) {
 		Connection connection = null;
 		Statement statement = null;
 		try {
@@ -45,36 +47,37 @@ public class DBUtil {
 			connection = DriverManager.getConnection(dbSourceUrl);
 			statement = connection.createStatement();
 			ResultSet resultSet = statement.executeQuery(querySql);
-			showResultSet(resultSet);
+			return showResultSet(resultSet);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new RuntimeException(String.format("执行SQL失败:'%s'", querySql),
+					e);
 		} finally {
 			CommonUtils.closeQuietly(statement);
 			CommonUtils.closeQuietly(connection);
 		}
 	}
 
-	private static void showResultSet(ResultSet resultSet) throws SQLException {
+	private static DBTable showResultSet(ResultSet resultSet)
+			throws SQLException {
+		DBTable dbTable = new DBTable();
 		ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
 		int colCnt = resultSetMetaData.getColumnCount();
 		for (int i = 1; i <= colCnt; i++) {
-			System.out.print(resultSetMetaData.getColumnLabel(i) + "\t");
+			dbTable.addColumnName(resultSetMetaData.getColumnLabel(i));
 		}
-		System.out.println();
 		resultSet.beforeFirst();
 		while (resultSet.next()) {
+			List<String> rowDataList = new ArrayList<String>();
 			for (int i = 1; i <= colCnt; i++) {
-				System.out.print(resultSet.getString(i) + "\t");
+				rowDataList.add(resultSet.getString(i));
 			}
-			System.out.println();
+			dbTable.addRowData(rowDataList);
 		}
+		return dbTable;
 	}
 
 	public static void main(String[] args) {
 		DBUtil.init();
-		// DBUtil.executeQuery("select TABLE_NAME from  INFORMATION_SCHEMA.tables");
-		// DBUtil.execute("insert into stock values(600035,'楚天高速')");
-		// DBUtil.executeQuery("select * from  stock");
 		DBUtil.execute("delete from stock where id='600035'");
 		DBUtil.executeQuery("select * from  stock");
 	}

@@ -21,14 +21,9 @@ public class DateCenter {
 	private DateCenter() {
 	}
 
-	public static String getCurrentGMT8DateStr() throws MalformedURLException,
+	public static String getCurrentGMT8Datetime() throws MalformedURLException,
 			IOException, ParseException {
-		Date date = getCurrentDatetime();
-		SimpleDateFormat dateFormatForGMT8 = new SimpleDateFormat(
-				"yyyy-MM-dd HH:mm:ss.SSS", Locale.US);
-		dateFormatForGMT8.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
-		String formatedDate = dateFormatForGMT8.format(date);
-		return formatedDate;
+		return getCurrentGMT8DateStr("yyyy-MM-dd HH:mm:ss.SSS");
 	}
 
 	public static Date getCurrentDatetime() throws MalformedURLException,
@@ -41,5 +36,15 @@ public class DateCenter {
 				.get(0);
 		Date date = dateFormatForBaidu.parse(dateHeaderField);
 		return date;
+	}
+
+	public static String getCurrentGMT8DateStr(String pattern)
+			throws MalformedURLException, IOException, ParseException {
+		Date date = getCurrentDatetime();
+		SimpleDateFormat dateFormatForGMT8 = new SimpleDateFormat(pattern,
+				Locale.US);
+		dateFormatForGMT8.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+		String formatedDate = dateFormatForGMT8.format(date);
+		return formatedDate;
 	}
 }

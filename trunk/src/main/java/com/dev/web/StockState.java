@@ -1,91 +1,143 @@
 package com.dev.web;
 
-
 public class StockState {
 
-	private final String stockId;
-	private boolean valid;
-	private String currentPrice;
-	private String deltaPrice;
-	private String deltaPercent;
-	private String turnoverRate;
-	private String dateTime;
-	private String closingPriceYesterday;
-	private String openingPrice;
-	private String topPrice;
-	private String lowestPrice;
-	private String turnover;
-	private String volume;
-	private String relativeRate;
-	private String priceEarningsRatio;
-	private String sell;
-	private String buy;
+	private final String 股票代码;
+	private String 当前价;
+	private String 涨跌额;
+	private String 涨跌幅;
+	private String 换手率;
+	private String 更新时间;
+	private String 昨收盘价;
+	private String 今开盘价;
+	private String 最高价;
+	private String 最低价;
+	private String 成交额;
+	private String 成交量;
+	private String 量比;
+	private String 市盈率;
+	private String 内盘;
+	private String 外盘;
 
-	public StockState(String stockId) {
-		this.stockId = stockId;
+	public StockState(String 股票代码) {
+		this.股票代码 = 股票代码;
 		initPropertyFromWeb();
 	}
 
 	private void initPropertyFromWeb() {
-		this.valid = false;
 		String stockPageUrl = String.format(
 				"http://wap.eastmoney.com/StockInfo.aspx?stockcode=%s&vt=0",
-				stockId);
+				股票代码);
 		String pageContent = CommonUtils.getWebPageContent(stockPageUrl);
-		this.currentPrice = CommonUtils.extractRegexGroup1(pageContent,
+		this.当前价 = CommonUtils.extractRegexGroup1(pageContent,
 				"当前价：([0-9\\.]+)元");
-		this.deltaPrice = CommonUtils.extractRegexGroup1(pageContent,
+		this.涨跌额 = CommonUtils.extractRegexGroup1(pageContent,
 				"涨跌额：([0-9\\.\\-]+)");
-		this.deltaPercent = CommonUtils.extractRegexGroup1(pageContent,
+		this.涨跌幅 = CommonUtils.extractRegexGroup1(pageContent,
 				"涨跌幅：([0-9\\.\\-\\%]+)");
-		this.turnoverRate = CommonUtils.extractRegexGroup1(pageContent,
+		this.换手率 = CommonUtils.extractRegexGroup1(pageContent,
 				"换手率：([0-9\\.\\-\\%]+)");
-		this.dateTime = CommonUtils.extractRegexGroup1(pageContent,
+		this.更新时间 = CommonUtils.extractRegexGroup1(pageContent,
 				"更新时间：([0-9\\.\\-: ]+)");
 
-		this.closingPriceYesterday = CommonUtils.extractRegexGroup1(
-				pageContent, "昨收盘：([0-9\\.\\-: ]+)");
-		this.openingPrice = CommonUtils.extractRegexGroup1(pageContent,
+		this.昨收盘价 = CommonUtils.extractRegexGroup1(pageContent,
+				"昨收盘：([0-9\\.\\-: ]+)");
+		this.今开盘价 = CommonUtils.extractRegexGroup1(pageContent,
 				"今开盘：([0-9\\.\\-: ]+)");
-		this.topPrice = CommonUtils.extractRegexGroup1(pageContent,
+		this.最高价 = CommonUtils.extractRegexGroup1(pageContent,
 				"最高价：([0-9\\.\\-: ]+)");
-		this.lowestPrice = CommonUtils.extractRegexGroup1(pageContent,
+		this.最低价 = CommonUtils.extractRegexGroup1(pageContent,
 				"最低价：([0-9\\.\\-: ]+)");
-		this.volume = CommonUtils.extractRegexGroup1(pageContent,
+		this.成交量 = CommonUtils.extractRegexGroup1(pageContent,
 				"成交量：([0-9\\.\\-: ]+)");
-		this.turnover = CommonUtils.extractRegexGroup1(pageContent,
+		this.成交额 = CommonUtils.extractRegexGroup1(pageContent,
 				"成交额：([0-9\\.\\-: ]+)");
 
-		this.relativeRate = CommonUtils.extractRegexGroup1(pageContent,
+		this.量比 = CommonUtils.extractRegexGroup1(pageContent,
 				"量比：([0-9\\.\\-: ]+)");
-		this.priceEarningsRatio = CommonUtils.extractRegexGroup1(pageContent,
+		this.市盈率 = CommonUtils.extractRegexGroup1(pageContent,
 				"市盈：([0-9\\.\\-: ]+)");
-		this.sell = CommonUtils.extractRegexGroup1(pageContent,
+		this.内盘 = CommonUtils.extractRegexGroup1(pageContent,
 				"内盘：([0-9\\.\\-: ]+)");
-		this.buy = CommonUtils.extractRegexGroup1(pageContent,
+		this.外盘 = CommonUtils.extractRegexGroup1(pageContent,
 				"外盘：([0-9\\.\\-: ]+)");
 	}
 
-	public static StockState get(String stockId) {
-		return new StockState(stockId);
+	public static StockState get(String 股票代码) {
+		return new StockState(股票代码);
 	}
 
-	public String getCurrentPrice() {
-		return currentPrice;
+	public String get股票代码() {
+		return 股票代码;
+	}
+
+	public String get当前价() {
+		return 当前价;
+	}
+
+	public String get涨跌额() {
+		return 涨跌额;
+	}
+
+	public String get涨跌幅() {
+		return 涨跌幅;
+	}
+
+	public String get换手率() {
+		return 换手率;
+	}
+
+	public String get更新时间() {
+		return 更新时间;
+	}
+
+	public String get昨收盘价() {
+		return 昨收盘价;
+	}
+
+	public String get今开盘价() {
+		return 今开盘价;
+	}
+
+	public String get最高价() {
+		return 最高价;
+	}
+
+	public String get最低价() {
+		return 最低价;
+	}
+
+	public String get成交额() {
+		return 成交额;
+	}
+
+	public String get成交量() {
+		return 成交量;
+	}
+
+	public String get量比() {
+		return 量比;
+	}
+
+	public String get市盈率() {
+		return 市盈率;
+	}
+
+	public String get内盘() {
+		return 内盘;
+	}
+
+	public String get外盘() {
+		return 外盘;
 	}
 
 	@Override
 	public String toString() {
-		return "StockState [stockId=" + stockId + ", valid=" + valid
-				+ ", currentPrice=" + currentPrice + ", deltaPrice="
-				+ deltaPrice + ", deltaPercent=" + deltaPercent
-				+ ", turnoverRate=" + turnoverRate + ", dateTime=" + dateTime
-				+ ", closingPriceYesterday=" + closingPriceYesterday
-				+ ", openingPrice=" + openingPrice + ", topPrice=" + topPrice
-				+ ", lowestPrice=" + lowestPrice + ", turnover=" + turnover
-				+ ", volume=" + volume + ", relativeRate=" + relativeRate
-				+ ", priceEarningsRatio=" + priceEarningsRatio + ", sell="
-				+ sell + ", buy=" + buy + "]";
+		return "StockState [股票代码=" + 股票代码 + ", 当前价=" + 当前价 + ", 涨跌额=" + 涨跌额
+				+ ", 涨跌幅=" + 涨跌幅 + ", 换手率=" + 换手率 + ", 更新时间=" + 更新时间
+				+ ", 昨收盘价=" + 昨收盘价 + ", 今开盘价=" + 今开盘价 + ", 最高价=" + 最高价
+				+ ", 最低价=" + 最低价 + ", 成交额=" + 成交额 + ", 成交量=" + 成交量 + ", 量比="
+				+ 量比 + ", 市盈率=" + 市盈率 + ", 内盘=" + 内盘 + ", 外盘=" + 外盘 + "]";
 	}
 
 }

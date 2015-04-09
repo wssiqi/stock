@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,8 +23,8 @@ public class StocksTest {
 	public void test() {
 		List<String> stockIdList = Stocks.getAllStockId();
 		for (String stockId : stockIdList) {
-			Stock stock = Stock.get(stockId);
-			System.out.println(stock.getCurrentPrice());
+			StockState stockState = StockState.get(stockId);
+			System.out.println(stockState);
 		}
 	}
 

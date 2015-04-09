@@ -18,7 +18,8 @@ public class DBUtilTest {
 
 	@Test
 	public void test() {
-		DBUtil.executeQuery("select * from stock order by id");
+		DBTable dbtable = DBUtil.executeQuery("select * from daily000001");
+		System.out.println();
 	}
 
 }

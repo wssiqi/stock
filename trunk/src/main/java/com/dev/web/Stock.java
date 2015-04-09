@@ -15,7 +15,7 @@ public class Stock {
 	public String getCurrentPrice() {
 		StockState stockState = StockState.get(stockId);
 		System.out.println(stockState);
-		return stockState.getCurrentPrice();
+		return stockState.get当前价();
 	}
 
 }

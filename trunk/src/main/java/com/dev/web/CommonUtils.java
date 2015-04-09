@@ -5,7 +5,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 public class CommonUtils {
 	private static Logger logger = Logger.getLogger(CommonUtils.class);
@@ -31,23 +30,21 @@ public class CommonUtils {
 
 	public static String getWebPageContent(String htmlUrl) {
 		try {
-			System.setProperty("http.proxyHost", "10.144.1.10");
-			System.setProperty("http.proxyPort", "8080");
-			Document document = Jsoup.parse(new URL(htmlUrl), 5000);
-			return document.text();
+			return Jsoup.parse(new URL(htmlUrl), 5000).text();
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new RuntimeException(String.format("获取网址'%s'失败~", htmlUrl), e);
 		}
-		return "";
 	}
 
 	public static String extractRegexGroup1(String string, String regex) {
 		Matcher matcher = Pattern.compile(regex).matcher(string);
 		if (matcher.find()) {
-			if (matcher.groupCount() > 1) {
+			if (matcher.groupCount() > 0) {
 				return matcher.group(1);
 			}
 		}
-		return "";
+		throw new RuntimeException(String.format(
+				"ExtractRegexGroup1 error, string='%s', regex='%s'", string,
+				regex));
 	}
 }
