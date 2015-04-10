@@ -75,7 +75,7 @@ public class HistoricalPriceDataDownloader {
 				String currentDate = DateUtils.getCurrentDateGMT8("yyyyMMdd");
 				String csvDownloadUrl = String
 						.format("http://quotes.money.163.com/service/chddata.html?"
-								+ "code=1%s&start=19900101&"
+								+ "code=1%s&start=20050101&"
 								+ "end=%s&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP",
 								stockId, currentDate);
 				URL url = new URL(csvDownloadUrl);
