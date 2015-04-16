@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import com.dev.web.downloader.Downloader;
 import com.dev.web.downloader.FundFlowDownloader;
+import com.dev.web.model.Stocks;
 
 public class DownloaderTest {
 

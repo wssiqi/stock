@@ -16,6 +16,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+
+import com.dev.web.model.Stocks;
 
 public class HistoricalPriceDataDownloader {
 

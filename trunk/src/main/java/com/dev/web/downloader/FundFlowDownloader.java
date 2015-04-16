@@ -24,7 +24,6 @@ public class FundFlowDownloader extends Downloader {
     }
 
     public static void main(String[] args) {
-        // System.out.println(Stocks.getAllStockId());
         List<String> stockIdList = Arrays.asList("600730");
         new FundFlowDownloader(stockIdList).download();
     }
