@@ -11,10 +11,6 @@ public class CsvModelTest {
 
     @Test
     public void test() {
-        Table csvModel = new Table();
-        List<String> headerList = Arrays.asList("1", "2", "3");
-        csvModel.setParent(headerList);
-        csvModel.addRow(headerList);
     }
 
 }

@@ -19,118 +19,131 @@ import com.dev.web.StockException;
 
 public abstract class Downloader {
 
-    private final List<String> stockIdList;
-    private final File saveToFolder;
-    private final String fileExtension;
+	private final List<String> stockIdList;
+	private final File saveToFolder;
+	private final String fileExtension;
 
-    public Downloader(List<String> stockIdList, File saveToFolder, String fileExtension) {
-        this.stockIdList = stockIdList;
-        this.saveToFolder = saveToFolder;
-        this.fileExtension = fileExtension;
-        checkParameters();
-    }
+	public Downloader(List<String> stockIdList, File saveToFolder,
+			String fileExtension) {
+		this.stockIdList = stockIdList;
+		this.saveToFolder = saveToFolder;
+		this.fileExtension = fileExtension;
+		checkParameters();
+	}
 
-    private void checkParameters() {
-        if (stockIdList == null) {
-            throw new StockException("stockIdList can not be null");
-        }
+	private void checkParameters() {
+		if (stockIdList == null) {
+			throw new StockException("stockIdList can not be null");
+		}
 
-        if (saveToFolder == null) {
-            throw new StockException("saveToFolder can not be null");
-        }
+		if (saveToFolder == null) {
+			throw new StockException("saveToFolder can not be null");
+		}
 
-        if (fileExtension == null) {
-            throw new StockException("fileExtension can not be null");
-        }
+		if (fileExtension == null) {
+			throw new StockException("fileExtension can not be null");
+		}
 
-        try {
-            if (saveToFolder.exists()) {
-                if (saveToFolder.isFile()) {
-                    throw new StockException(String.format("saveToFolder '%s' is a file.",
-                            saveToFolder.getAbsolutePath()));
-                }
-            } else if (!saveToFolder.mkdirs()) {
-                throw new StockException(String.format("Try create saveToFolder '%s' failed.",
-                        saveToFolder.getAbsolutePath()));
-            }
-        } catch (StockException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new StockException(String.format("Try create saveToFolder '%s' failed.",
-                    saveToFolder.getAbsolutePath()), e);
-        }
+		try {
+			if (saveToFolder.exists()) {
+				if (saveToFolder.isFile()) {
+					throw new StockException(String.format(
+							"saveToFolder '%s' is a file.",
+							saveToFolder.getAbsolutePath()));
+				}
+			} else if (!saveToFolder.mkdirs()) {
+				throw new StockException(String.format(
+						"Try create saveToFolder '%s' failed.",
+						saveToFolder.getAbsolutePath()));
+			}
+		} catch (StockException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new StockException(String.format(
+					"Try create saveToFolder '%s' failed.",
+					saveToFolder.getAbsolutePath()), e);
+		}
 
-    }
+	}
 
-    public void download() {
-        ExecutorService newFixedThreadPool = Executors.newFixedThreadPool(5);
-        List<Future<File>> futureList = new ArrayList<Future<File>>();
-        for (String stockId : stockIdList) {
-            URL downloadUrl = makeDownloadUrl(stockId);
-            File saveToFilename = makeSaveToFile(stockId);
-            Future<File> future = newFixedThreadPool.submit(new DownloadThread(downloadUrl, saveToFilename));
-            futureList.add(future);
-        }
-        newFixedThreadPool.shutdown();
-        for (Future<File> future : futureList) {
-            try {
-                System.out.println(future.get());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+	public void download() {
+		ExecutorService newFixedThreadPool = Executors.newFixedThreadPool(10);
+		List<Future<File>> futureList = new ArrayList<Future<File>>();
+		int i = 0;
+		for (String stockId : stockIdList) {
+			URL downloadUrl = makeDownloadUrl(stockId);
+			File saveToFilename = makeSaveToFile(stockId);
+			Future<File> future = newFixedThreadPool.submit(new DownloadThread(
+					downloadUrl, saveToFilename));
+			futureList.add(future);
+			System.out.println(String.format("submit %2.2f %s", 100.0 * i++
+					/ stockIdList.size(), stockId));
+		}
+		newFixedThreadPool.shutdown();
+		i = 0;
+		for (Future<File> future : futureList) {
+			try {
+				File x = future.get();
+				System.out.println(String.format("%2.2f %s", 100.0 * i++
+						/ futureList.size(), x.getAbsolutePath()));
 
-    }
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
-    protected File makeSaveToFile(String stockId) {
-        return new File(saveToFolder, stockId + fileExtension);
-    }
+	}
 
-    protected abstract URL makeDownloadUrl(String stockId);
+	protected File makeSaveToFile(String stockId) {
+		return new File(saveToFolder, stockId + fileExtension);
+	}
 
-    static class DownloadThread implements Callable<File> {
+	protected abstract URL makeDownloadUrl(String stockId);
 
-        private final URL downloadUrl;
-        private final File saveToFile;
-        private Exception lastException;
+	static class DownloadThread implements Callable<File> {
 
-        public DownloadThread(URL downloadUrl, File saveToFile) {
-            this.downloadUrl = downloadUrl;
-            this.saveToFile = saveToFile;
-        }
+		private final URL downloadUrl;
+		private final File saveToFile;
+		private Exception lastException;
 
-        public File call() throws Exception {
-            int retryTimes = 2;
-            while (retryTimes-- > 0) {
-                if (successfulDownloadUrlToFile()) {
-                    break;
-                }
-            }
-            if (lastException != null) {
-                throw new StockException(String.format("Download '%s' failed!", downloadUrl), lastException);
-            }
-            return saveToFile;
-        }
+		public DownloadThread(URL downloadUrl, File saveToFile) {
+			this.downloadUrl = downloadUrl;
+			this.saveToFile = saveToFile;
+		}
 
-        private boolean successfulDownloadUrlToFile() {
-            lastException = null;
-            InputStream in = null;
-            OutputStream out = null;
-            try {
-                URLConnection openConnection = downloadUrl.openConnection();
-                openConnection.setConnectTimeout(2000);
-                openConnection.setReadTimeout(20000);
-                in = openConnection.getInputStream();
-                out = new FileOutputStream(saveToFile);
-                IOUtils.copy(in, out);
-                return true;
-            } catch (Exception e) {
-                this.lastException = e;
-            } finally {
-                IOUtils.closeQuietly(in);
-                IOUtils.closeQuietly(out);
-            }
-            return false;
-        }
-    }
+		public File call() throws Exception {
+			int retryTimes = 2;
+			while (retryTimes-- > 0) {
+				if (successfulDownloadUrlToFile()) {
+					break;
+				}
+			}
+			if (lastException != null) {
+				throw new StockException(String.format("Download '%s' failed!",
+						downloadUrl), lastException);
+			}
+			return saveToFile;
+		}
+
+		private boolean successfulDownloadUrlToFile() {
+			lastException = null;
+			InputStream in = null;
+			OutputStream out = null;
+			try {
+				URLConnection openConnection = downloadUrl.openConnection();
+				openConnection.setConnectTimeout(2000);
+				openConnection.setReadTimeout(20000);
+				in = openConnection.getInputStream();
+				out = new FileOutputStream(saveToFile);
+				IOUtils.copy(in, out);
+				return true;
+			} catch (Exception e) {
+				this.lastException = e;
+			} finally {
+				IOUtils.closeQuietly(in);
+				IOUtils.closeQuietly(out);
+			}
+			return false;
+		}
+	}
 }

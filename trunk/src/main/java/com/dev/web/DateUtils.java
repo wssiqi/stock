@@ -36,6 +36,14 @@ public class DateUtils {
 		return getCurrentDateGMT8("yyyy-MM-dd");
 	}
 
+	public static String getYestorday() {
+		Date date = getCurrentDatetimeGMT8();
+		long timeInMsFrom1990 = date.getTime();
+		long timeFor24H = 24 * 60 * 60 * 1000;
+		Date yestordayDate = new Date(timeInMsFrom1990 - timeFor24H);
+		return getDateString("yyyyMMdd", yestordayDate);
+	}
+
 	public static Date getCurrentDatetimeGMT8() {
 		try {
 			URL url = new URL("http://m.baidu.com");
@@ -53,6 +61,10 @@ public class DateUtils {
 
 	public static String getCurrentDateGMT8(String pattern) {
 		Date date = getCurrentDatetimeGMT8();
+		return getDateString(pattern, date);
+	}
+
+	private static String getDateString(String pattern, Date date) {
 		SimpleDateFormat dateFormatForGMT8 = new SimpleDateFormat(pattern,
 				Locale.US);
 		dateFormatForGMT8.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));

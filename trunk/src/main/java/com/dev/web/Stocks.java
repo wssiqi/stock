@@ -23,7 +23,7 @@ public class Stocks {
 	}
 
 	private static List<String> getStockIdList() {
-		CommonUtils.setProxy();
+//		CommonUtils.setProxy();
 		Document stockListDoc = null;
 		try {
 			logger.warn("尝试从网络获取列表...");
@@ -38,14 +38,27 @@ public class Stocks {
 		List<String> stockIdList = new ArrayList<String>();
 		for (Element stockElement : stockElements) {
 			String stockInfo = StringUtils.trim(stockElement.text());
-			System.out.println(stockInfo);
 			String stockId = getStockId(stockInfo);
-			if (!StringUtils.isEmpty(stockId)) {
+			if (isStockValid(stockId)) {
 				stockIdList.add(stockId);
 			}
 		}
 		logger.info("列表总数：" + stockIdList.size());
 		return stockIdList;
+	}
+
+	private static boolean isStockValid(String stockId) {
+		if (StringUtils.isEmpty(stockId)) {
+			return false;
+		}
+		switch (stockId.charAt(0)) {
+		case '0':
+		case '3':
+		case '6':
+			return true;
+		default:
+			return false;
+		}
 	}
 
 	/**
@@ -68,7 +81,8 @@ public class Stocks {
 		try {
 			return Jsoup.parse(new URL(stockListUrl), 10000);
 		} catch (Exception e) {
-			throw new RuntimeException(String.format("从'%s'获取股票列表失败!", stockListUrl), e);
+			throw new RuntimeException(String.format("从'%s'获取股票列表失败!",
+					stockListUrl), e);
 		}
 	}
 
@@ -77,7 +91,8 @@ public class Stocks {
 		try {
 			return Jsoup.parse(localFile, "utf-8");
 		} catch (Exception e) {
-			throw new RuntimeException(String.format("从'%s'获取股票列表失败!", localFile.getAbsolutePath()), e);
+			throw new RuntimeException(String.format("从'%s'获取股票列表失败!",
+					localFile.getAbsolutePath()), e);
 		}
 	}
 
