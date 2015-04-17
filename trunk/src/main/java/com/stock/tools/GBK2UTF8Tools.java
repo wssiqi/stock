@@ -1,7 +1,5 @@
 package com.stock.tools;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,8 +17,8 @@ public class GBK2UTF8Tools {
 	public static void main(String[] args) {
 		File srcDir = new File("daily");
 		File dstDir = new File("daily-utf8");
-//		convertFileEncoding(srcDir, dstDir);
-		importCsvDataToTable(dstDir);
+		convertFileEncoding(srcDir, dstDir);
+//		importCsvDataToTable(dstDir);
 	}
 
 	private static void importCsvDataToTable(File dstDir) {
@@ -49,10 +47,8 @@ public class GBK2UTF8Tools {
 			try {
 				in = new InputStreamReader(new FileInputStream(srcFile),
 						Charset.forName("GBK"));
-				in = new BufferedReader(in);
 				out = new OutputStreamWriter(new FileOutputStream(new File(
 						dstDir, srcFile.getName())), Charset.forName("UTF-8"));
-				out = new BufferedWriter(out);
 				IOUtils.copy(in, out);
 			} catch (Exception e) {
 				e.printStackTrace();

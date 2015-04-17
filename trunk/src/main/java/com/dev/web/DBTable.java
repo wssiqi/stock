@@ -3,6 +3,7 @@ package com.dev.web;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.ResultSet;
@@ -85,7 +86,9 @@ public class DBTable {
     public void writeToCSV(File csvFile) {
         Writer out = null;
         try {
-            out = new OutputStreamWriter(new FileOutputStream(csvFile), Charsets.UTF_8);
+            OutputStream outStream = new FileOutputStream(csvFile);
+            writeUTF8Bom(outStream);
+            out = new OutputStreamWriter(outStream, Charsets.UTF_8);
             out = new BufferedWriter(out, BUFFER_64K);
             writeColumnNames(out);
             writeRowValues(out);
@@ -95,6 +98,12 @@ public class DBTable {
         } finally {
             IOUtils.closeQuietly(out);
         }
+    }
+
+    private void writeUTF8Bom(OutputStream outStream) throws Exception {
+        outStream.write(0xEF);
+        outStream.write(0xBB);
+        outStream.write(0xBF);
     }
 
     private void writeColumnNames(Writer out) throws Exception {

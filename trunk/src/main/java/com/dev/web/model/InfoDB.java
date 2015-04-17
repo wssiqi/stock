@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.h2.tools.Csv;
 
 import com.dev.web.DBTable;
@@ -36,16 +37,24 @@ public class InfoDB extends BaseDB {
     }
 
     public static void main(String[] args) {
+        Csv csv = new Csv();
         try {
-            Csv csv = new Csv();
             ResultSet read = csv.read(new InputStreamReader(new FileInputStream("daily/000001.csv"), "GBK"), null);
             DBTable table = new DBTable();
             table.parseResultSet(read);
             table.writeToCSV(new File("test.csv"));
             System.out.println(read);
+            CsvResultSet set = new CsvResultSet();
+            set.addColumn(new String[] { "A,test\"", "\r\nB", "C" });
+            Csv csv2 = new Csv();
+            csv2.write("test1.csv", set, "");
+            csv2.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger(InfoDB.class).error(e.getMessage(), e);
+        } finally {
+            csv.close();
         }
+
     }
 
 }
