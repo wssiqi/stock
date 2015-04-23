@@ -1,4 +1,4 @@
-package com.dev.web.model;
+package com.stock.tools;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
