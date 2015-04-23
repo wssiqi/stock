@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 
 import com.dev.web.StockException;
 
@@ -69,26 +70,20 @@ public abstract class Downloader {
 	public void download() {
 		ExecutorService newFixedThreadPool = Executors.newFixedThreadPool(10);
 		List<Future<File>> futureList = new ArrayList<Future<File>>();
-		int i = 0;
 		for (String stockId : stockIdList) {
 			URL downloadUrl = makeDownloadUrl(stockId);
 			File saveToFilename = makeSaveToFile(stockId);
 			Future<File> future = newFixedThreadPool.submit(new DownloadThread(
 					downloadUrl, saveToFilename));
 			futureList.add(future);
-			System.out.println(String.format("submit %2.2f %s", 100.0 * i++
-					/ stockIdList.size(), stockId));
 		}
 		newFixedThreadPool.shutdown();
-		i = 0;
 		for (Future<File> future : futureList) {
 			try {
-				File x = future.get();
-				System.out.println(String.format("%2.2f %s", 100.0 * i++
-						/ futureList.size(), x.getAbsolutePath()));
-
+				File file = future.get();
+				System.out.println(file.getAbsolutePath());
 			} catch (Exception e) {
-				e.printStackTrace();
+				Logger.getLogger(getClass()).error(e.getMessage(), e);
 			}
 		}
 

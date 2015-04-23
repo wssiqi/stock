@@ -4,9 +4,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.regex.Pattern;
 
-import com.dev.web.DateUtils;
 import com.dev.web.StockException;
 import com.dev.web.Stocks;
 
@@ -23,14 +21,13 @@ public class StockInfoDownloader extends Downloader {
 	@Override
 	protected URL makeDownloadUrl(String stockId) {
 		try {
-			String yestorday = DateUtils.getYestorday();
-			String today = DateUtils.getCurrentDateGMT8("yyyyMMdd");
+			String yestorday = "20150201";
+			String today = "20150422";
 			String csvDownloadUrl = String
 					.format("http://quotes.money.163.com/service/chddata.html?"
 							+ "code=%s&start=%s&"
 							+ "end=%s&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP",
 							getCodeWithPrefix(stockId), yestorday, today);
-			System.out.println(csvDownloadUrl);
 			return new URL(csvDownloadUrl);
 		} catch (MalformedURLException e) {
 			throw new StockException(e);

@@ -37,7 +37,7 @@ public class DateUtils {
 	}
 
 	public static String getYestorday() {
-		Date date = getCurrentDatetimeGMT8();
+		Date date = new Date();
 		long timeInMsFrom1990 = date.getTime();
 		long timeFor24H = 24 * 60 * 60 * 1000;
 		Date yestordayDate = new Date(timeInMsFrom1990 - timeFor24H);
@@ -64,7 +64,7 @@ public class DateUtils {
 		return getDateString(pattern, date);
 	}
 
-	private static String getDateString(String pattern, Date date) {
+	public static String getDateString(String pattern, Date date) {
 		SimpleDateFormat dateFormatForGMT8 = new SimpleDateFormat(pattern,
 				Locale.US);
 		dateFormatForGMT8.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
