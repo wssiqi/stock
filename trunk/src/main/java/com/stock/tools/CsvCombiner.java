@@ -16,16 +16,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.dev.web.CommonUtils;
+
 public class CsvCombiner {
 
 	private static final int BUFFER_64K = 64 * 1024;
 	private static final Logger LOGGER = Logger.getLogger(CsvCombiner.class);
-	private static final char EXTENSION_SEPERATOR = '.';
 	private Charset charsetForRead = Charset.defaultCharset();
 	private Charset charsetForWrite = Charset.defaultCharset();
-
-	public static void main(String[] args) {
-	}
 
 	public void setCharsetForRead(Charset charsetForRead) {
 		this.charsetForRead = charsetForRead;
@@ -96,36 +94,12 @@ public class CsvCombiner {
 	}
 
 	private void checkParameters(File csvFile) {
-		String fileExtension = getFileExtension(csvFile);
+		String fileExtension = CommonUtils.getFileExtension(csvFile);
 		if (!fileExtension.equalsIgnoreCase("csv")) {
 			throw new RuntimeException(String.format(
 					"'%s' is not a csv file, wrong file extension.",
-					getAbsolutePath(csvFile)));
+					CommonUtils.getAbsolutePath(csvFile)));
 		}
-	}
-
-	private String getAbsolutePath(File file) {
-		if (file == null) {
-			return null;
-		}
-		try {
-			return file.getAbsolutePath();
-		} catch (Exception e) {
-			LOGGER.error(e.getMessage(), e);
-			return file.getPath();
-		}
-	}
-
-	private String getFileExtension(File file) {
-		if (file == null) {
-			return "";
-		}
-		String fileName = file.getName();
-		int extensionSeperatorIndex = fileName.lastIndexOf(EXTENSION_SEPERATOR);
-		if (extensionSeperatorIndex == -1) {
-			return "";
-		}
-		return fileName.substring(extensionSeperatorIndex + 1);
 	}
 
 }

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.dev.web.StockException;
+import com.dev.web.model.Stocks;
 
 public class FundFlowDownloader extends Downloader {
 
@@ -24,8 +25,7 @@ public class FundFlowDownloader extends Downloader {
     }
 
     public static void main(String[] args) {
-        List<String> stockIdList = Arrays.asList("600730");
-        new FundFlowDownloader(stockIdList).download();
+        new FundFlowDownloader( Stocks.getAllStockId()).download();
     }
 
 }

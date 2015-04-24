@@ -10,24 +10,24 @@ import com.dev.web.model.Stocks;
 
 public class StockInfoDownloader extends Downloader {
 
-	public static void main(String[] args) {
-		new StockInfoDownloader(Stocks.getAllStockId()).download();
-	}
+	private final String startDate;
+	private final String endDate;
 
-	public StockInfoDownloader(List<String> stockIdList) {
+	public StockInfoDownloader(List<String> stockIdList, String startDate,
+			String endDate) {
 		super(stockIdList, new File("StockInfo"), ".csv");
+		this.startDate = startDate;
+		this.endDate = endDate;
 	}
 
 	@Override
 	protected URL makeDownloadUrl(String stockId) {
 		try {
-			String yestorday = "20150201";
-			String today = "20150422";
 			String csvDownloadUrl = String
 					.format("http://quotes.money.163.com/service/chddata.html?"
 							+ "code=%s&start=%s&"
 							+ "end=%s&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP",
-							getCodeWithPrefix(stockId), yestorday, today);
+							getCodeWithPrefix(stockId), startDate, endDate);
 			return new URL(csvDownloadUrl);
 		} catch (MalformedURLException e) {
 			throw new StockException(e);
