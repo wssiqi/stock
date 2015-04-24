@@ -108,7 +108,7 @@ public class CommonUtils {
 	}
 
 	public static void setProxy() {
-		// System.setProperty("http.proxyHost", "10.144.1.10");
-		// System.setProperty("http.proxyPort", "8080");
+        System.setProperty("http.proxyHost", "10.144.1.10");
+        System.setProperty("http.proxyPort", "8080");
 	}
 }

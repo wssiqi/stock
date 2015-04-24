@@ -6,7 +6,10 @@ import org.h2.tools.SimpleResultSet;
 
 public class CsvResultSet extends SimpleResultSet {
 
-    public void addColumn(String[] columnNames) {
+    public static void main(String[] args) {
+        new CsvResultSet().addColumn("abc");
+    }
+    public void addColumns(String... columnNames) {
         for (String columnName : columnNames) {
             addColumn(columnName);
         }

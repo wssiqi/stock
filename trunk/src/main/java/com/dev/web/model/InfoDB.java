@@ -48,7 +48,7 @@ public class InfoDB extends BaseDB {
 			table.writeToCSV(new File("test.csv"), Charsets.UTF_8);
 			System.out.println(read);
 			CsvResultSet set = new CsvResultSet();
-			set.addColumn(new String[] { "A,test\"", "\r\nB", "C" });
+			set.addColumns(new String[] { "A,test\"", "\r\nB", "C" });
 			Csv csv2 = new Csv();
 			csv2.write("test1.csv", set, "");
 			csv2.close();
