@@ -32,8 +32,8 @@ public class DBUtil {
         } catch (Exception e) {
             throw new RuntimeException(String.format("执行SQL失败:'%s'", sql), e);
         } finally {
-            CommonUtils.closeQuietly(statement);
-            CommonUtils.closeQuietly(connection);
+            CommUtils.closeQuietly(statement);
+            CommUtils.closeQuietly(connection);
         }
     }
 
@@ -51,8 +51,8 @@ public class DBUtil {
         } catch (Exception e) {
             throw new RuntimeException(String.format("执行SQL失败:'%s'", querySql), e);
         } finally {
-            CommonUtils.closeQuietly(statement);
-            CommonUtils.closeQuietly(connection);
+            CommUtils.closeQuietly(statement);
+            CommUtils.closeQuietly(connection);
         }
     }
 

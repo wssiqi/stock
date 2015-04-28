@@ -28,38 +28,38 @@ public class StockState {
 		String stockPageUrl = String.format(
 				"http://wap.eastmoney.com/StockInfo.aspx?stockcode=%s&vt=0",
 				股票代码);
-		String pageContent = CommonUtils.getWebPageContent(stockPageUrl);
-		this.当前价 = CommonUtils.extractRegexGroup1(pageContent,
+		String pageContent = CommUtils.getWebPageContent(stockPageUrl);
+		this.当前价 = CommUtils.extractRegexGroup1(pageContent,
 				"当前价：([0-9\\.]+)元");
-		this.涨跌额 = CommonUtils.extractRegexGroup1(pageContent,
+		this.涨跌额 = CommUtils.extractRegexGroup1(pageContent,
 				"涨跌额：([0-9\\.\\-]+)");
-		this.涨跌幅 = CommonUtils.extractRegexGroup1(pageContent,
+		this.涨跌幅 = CommUtils.extractRegexGroup1(pageContent,
 				"涨跌幅：([0-9\\.\\-\\%]+)");
-		this.换手率 = CommonUtils.extractRegexGroup1(pageContent,
+		this.换手率 = CommUtils.extractRegexGroup1(pageContent,
 				"换手率：([0-9\\.\\-\\%]+)");
-		this.更新时间 = CommonUtils.extractRegexGroup1(pageContent,
+		this.更新时间 = CommUtils.extractRegexGroup1(pageContent,
 				"更新时间：([0-9\\.\\-: ]+)");
 
-		this.昨收盘价 = CommonUtils.extractRegexGroup1(pageContent,
+		this.昨收盘价 = CommUtils.extractRegexGroup1(pageContent,
 				"昨收盘：([0-9\\.\\-: ]+)");
-		this.今开盘价 = CommonUtils.extractRegexGroup1(pageContent,
+		this.今开盘价 = CommUtils.extractRegexGroup1(pageContent,
 				"今开盘：([0-9\\.\\-: ]+)");
-		this.最高价 = CommonUtils.extractRegexGroup1(pageContent,
+		this.最高价 = CommUtils.extractRegexGroup1(pageContent,
 				"最高价：([0-9\\.\\-: ]+)");
-		this.最低价 = CommonUtils.extractRegexGroup1(pageContent,
+		this.最低价 = CommUtils.extractRegexGroup1(pageContent,
 				"最低价：([0-9\\.\\-: ]+)");
-		this.成交量 = CommonUtils.extractRegexGroup1(pageContent,
+		this.成交量 = CommUtils.extractRegexGroup1(pageContent,
 				"成交量：([0-9\\.\\-: ]+)");
-		this.成交额 = CommonUtils.extractRegexGroup1(pageContent,
+		this.成交额 = CommUtils.extractRegexGroup1(pageContent,
 				"成交额：([0-9\\.\\-: ]+)");
 
-		this.量比 = CommonUtils.extractRegexGroup1(pageContent,
+		this.量比 = CommUtils.extractRegexGroup1(pageContent,
 				"量比：([0-9\\.\\-: ]+)");
-		this.市盈率 = CommonUtils.extractRegexGroup1(pageContent,
+		this.市盈率 = CommUtils.extractRegexGroup1(pageContent,
 				"市盈：([0-9\\.\\-: ]+)");
-		this.内盘 = CommonUtils.extractRegexGroup1(pageContent,
+		this.内盘 = CommUtils.extractRegexGroup1(pageContent,
 				"内盘：([0-9\\.\\-: ]+)");
-		this.外盘 = CommonUtils.extractRegexGroup1(pageContent,
+		this.外盘 = CommUtils.extractRegexGroup1(pageContent,
 				"外盘：([0-9\\.\\-: ]+)");
 	}
 

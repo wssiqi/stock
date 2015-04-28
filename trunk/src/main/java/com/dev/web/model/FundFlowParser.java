@@ -12,7 +12,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.dev.web.CommonUtils;
+import com.dev.web.CommUtils;
 import com.dev.web.DBTable;
 import com.dev.web.StockException;
 
@@ -20,20 +20,20 @@ public abstract class FundFlowParser {
 	public static void main(String[] args) {
 		File pageFilesDir = new File("FundFlow");
 		File csvFilesDir = new File("FundFlowCsv");
-		CommonUtils.mkdirs(csvFilesDir);
+		CommUtils.mkdirs(csvFilesDir);
 		for (File file : pageFilesDir.listFiles()) {
-			String fileExtension = CommonUtils.getFileExtension(file);
+			String fileExtension = CommUtils.getFileExtension(file);
 			if (!"html".equalsIgnoreCase(fileExtension)) {
 				continue;
 			}
 			SimpleResultSet resultSet = FundFlowParser.parse(file);
-			String nameWithoutExtension = CommonUtils
+			String nameWithoutExtension = CommUtils
 					.getFileNameWithoutExtension(file);
 			File outCsvFile = new File(csvFilesDir, nameWithoutExtension
 					+ ".csv");
 			System.out.println(file);
 			try {
-				new Csv().write(CommonUtils.getAbsolutePath(outCsvFile),
+				new Csv().write(CommUtils.getAbsolutePath(outCsvFile),
 						resultSet, "gbk");
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -64,12 +64,12 @@ public abstract class FundFlowParser {
 				Element tableRowElement = tableRowElements.get(i);
 				Elements cellElements = tableRowElement.select("td");
 				ArrayList<String> tableRow = new ArrayList<String>();
-				String stockId = CommonUtils
+				String stockId = CommUtils
 						.getFileNameWithoutExtension(fundFlowPageFile);
 				tableRow.add("'" + stockId);
 				for (int j = 0; j < cellElements.size(); j++) {
 					Element cellElement = cellElements.get(j);
-					tableRow.add(StringUtils.trimToEmpty(cellElement.text()));
+					tableRow.add(CommUtils.trim(cellElement.text()));
 				}
 				csvResultSet.addRow(tableRow.toArray());
 			}

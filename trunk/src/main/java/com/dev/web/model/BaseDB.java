@@ -9,7 +9,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.dev.web.CommonUtils;
+import com.dev.web.CommUtils;
 import com.dev.web.DBTable;
 import com.dev.web.StockException;
 
@@ -33,8 +33,8 @@ public class BaseDB {
         } catch (Exception e) {
             throw new RuntimeException(String.format("执行SQL失败:'%s'", sql), e);
         } finally {
-            CommonUtils.closeQuietly(statement);
-            CommonUtils.closeQuietly(connection);
+            CommUtils.closeQuietly(statement);
+            CommUtils.closeQuietly(connection);
         }
     }
 
@@ -52,8 +52,8 @@ public class BaseDB {
         } catch (Exception e) {
             throw new RuntimeException(String.format("执行SQL失败:'%s'", querySql), e);
         } finally {
-            CommonUtils.closeQuietly(statement);
-            CommonUtils.closeQuietly(connection);
+            CommUtils.closeQuietly(statement);
+            CommUtils.closeQuietly(connection);
         }
     }
 

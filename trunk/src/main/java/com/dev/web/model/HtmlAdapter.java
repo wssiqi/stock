@@ -4,55 +4,69 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.dev.web.CommonUtils;
-import com.dev.web.StockException;
+import com.dev.web.CommUtils;
 
 public class HtmlAdapter {
 
-    private File htmlFile;
+	private String stockId;
 
-    public void setHtmlFile(File htmlFile) {
-        this.htmlFile = htmlFile;
-    }
+	public void setHtmlFile(File htmlFile) {
+		stockId = "'" + CommUtils.getFileNameWithoutExtension(htmlFile);
+	}
 
-    public Charset getHtmlFileCharset() {
-        return Charset.forName("GBK");
-    }
+	public Charset getHtmlFileCharset() {
+		return Charset.forName("GBK");
+	}
 
-    public String getRowsCssQuery() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	public String getRowsCssQuery() {
+		return null;
+	}
 
-    public String getCellsCssQuery() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	public String getCellsCssQuery() {
+		return null;
+	}
 
-    public String getColumnNamesCssQuery() {
-        return "thead tr th";
-    }
+	public String getColumnNamesCssQuery() {
+		return "thead tr th";
+	}
 
-    public void beforeParseColumnName(Elements columnNameElements, CsvResultSet resultSet) {
-        resultSet.addColumn("股票代码");
-        for (Element element : columnNameElements) {
-            
-        }
-    }
+	public void beforeParseColumnName(Elements columnNameElements,
+			CsvResultSet resultSet) {
+		resultSet.addColumn("股票代码");
 
-    public String parseColumnName(Element element) {
-        return null;
-    }
+		Elements copy = columnNameElements.clone();
+		Elements rowSpan = copy.select("th[rowspan]");
+		for (Element columnNameElement : rowSpan) {
+			resultSet.addColumn(CommUtils.trim(columnNameElement.text()));
+		}
 
-    public void beforeParseCells(List<String> rowValueList) {
-        rowValueList.add("'" + CommonUtils.getFileNameWithoutExtension(htmlFile));
-    }
+		Elements categorys = copy.select("th[colspan]");
+		copy.removeAll(rowSpan);
+		copy.removeAll(categorys);
+		Elements other = copy;
+		int otherIndex = 0;
+		for (int i = 0; i < categorys.size(); i++) {
+			Element category = categorys.get(i);
+			String prefix = CommUtils.trim(category.text());
+			resultSet.addColumn(prefix
+					+ CommUtils.trim(other.get(otherIndex++).text()));
+			resultSet.addColumn(prefix
+					+ CommUtils.trim(other.get(otherIndex++).text()));
+		}
+	}
 
-    public String parseCellValue(Element cellElement) {
-        return StringUtils.trimToEmpty(cellElement.text());
-    }
+	public String parseColumnName(Element element) {
+		return null;
+	}
+
+	public void beforeParseCells(List<String> rowValueList) {
+		rowValueList.add(stockId);
+	}
+
+	public String parseCellValue(Element cellElement) {
+		return CommUtils.trim(cellElement.text());
+	}
 }

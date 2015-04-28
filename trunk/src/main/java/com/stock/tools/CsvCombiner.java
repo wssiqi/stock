@@ -16,7 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.dev.web.CommonUtils;
+import com.dev.web.CommUtils;
 
 public class CsvCombiner {
 
@@ -94,11 +94,11 @@ public class CsvCombiner {
 	}
 
 	private void checkParameters(File csvFile) {
-		String fileExtension = CommonUtils.getFileExtension(csvFile);
+		String fileExtension = CommUtils.getFileExtension(csvFile);
 		if (!fileExtension.equalsIgnoreCase("csv")) {
 			throw new RuntimeException(String.format(
 					"'%s' is not a csv file, wrong file extension.",
-					CommonUtils.getAbsolutePath(csvFile)));
+					CommUtils.getAbsolutePath(csvFile)));
 		}
 	}
 

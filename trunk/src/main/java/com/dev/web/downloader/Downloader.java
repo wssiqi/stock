@@ -16,7 +16,7 @@ import java.util.concurrent.Future;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
-import com.dev.web.CommonUtils;
+import com.dev.web.CommUtils;
 import com.dev.web.StockException;
 
 public abstract class Downloader {
@@ -25,7 +25,7 @@ public abstract class Downloader {
     private final File saveToFolder;
     private final String fileExtension;
     static {
-        CommonUtils.setProxy();
+        CommUtils.setProxy();
     }
 
     public Downloader(List<String> stockIdList, File saveToFolder, String fileExtension) {
