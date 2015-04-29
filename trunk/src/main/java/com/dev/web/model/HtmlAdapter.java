@@ -1,6 +1,7 @@
 package com.dev.web.model;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -22,11 +23,11 @@ public class HtmlAdapter {
 	}
 
 	public String getRowsCssQuery() {
-		return null;
+		return "table.tab1 tbody tr";
 	}
 
 	public String getCellsCssQuery() {
-		return null;
+		return "td";
 	}
 
 	public String getColumnNamesCssQuery() {
@@ -67,6 +68,12 @@ public class HtmlAdapter {
 	}
 
 	public String parseCellValue(Element cellElement) {
-		return CommUtils.trim(cellElement.text());
+		String str = CommUtils.trim(cellElement.text());
+		int indexOf = str.indexOf('万');
+		if (indexOf != -1) {
+			return String.valueOf(new BigDecimal(str.replaceAll("万", ""))
+					.multiply(new BigDecimal(10000)));
+		}
+		return str;
 	}
 }
