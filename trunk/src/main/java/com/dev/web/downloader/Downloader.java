@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -90,7 +91,12 @@ public abstract class Downloader {
 			} catch (Exception e) {
 				Logger.getLogger(getClass()).error(e.getMessage(), e);
 				newFixedThreadPool.shutdownNow();
-				return;
+				try {
+					newFixedThreadPool.awaitTermination(1, TimeUnit.DAYS);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+				throw new RuntimeException(e);
 			}
 		}
 

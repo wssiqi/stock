@@ -16,26 +16,31 @@ import com.dev.web.DBTable;
 public class InfoDB extends BaseDB {
 
 	public InfoDB() {
-		DBTable resultTable = executeQuery("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='STOCKINFO'");
+		DBTable resultTable = executeQuery("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='STOCKHIS'");
 		if (resultTable.getRowList().isEmpty()) {
 			init();
 		}
 	}
 
-	private void init() {
-		execute("CREATE TABLE STOCKINFO(ID CHAR(10) PRIMARY KEY, NAME CHAR(20), TOTALVALUE DECIMAL(20,2), TOTALVOL DECIMAL(20,0), TOTALSTOCK DECIMAL(20,0), MARKETSTOCK DECIMAL(20,0))");
-		List<String> allStockId = Stocks.getAllStockId();
-		for (String stockId : allStockId) {
-			String insertSql = buildInsert("STOCKINFO", Arrays.asList("ID"),
-					Arrays.asList(stockId));
-			execute(insertSql);
-			System.out.println(insertSql);
-		}
+	public void init() {
+		execute("CREATE TABLE STOCKHIS( code CHAR(10), "
+				+ "date CHAR(10), "
+				+ "ePrice DECIMAL(20,4), "
+				+ "rate DECIMAL(20,4), "
+				+ "mainIn DECIMAL(20,4), "
+				+ "mainInRate DECIMAL(20,4), "
+				+ "HugeIn DECIMAL(20,4), "
+				+ "HugeInRate DECIMAL(20,4), "
+				+ "BigIn DECIMAL(20,4), "
+				+ "BigInRate DECIMAL(20,4), "
+				+ "MidIn DECIMAL(20,4), "
+				+ "MidInRate DECIMAL(20,4), SmallIn DECIMAL(20,4), SmallInRate DECIMAL(20,4))");
 	}
 
 	@Override
 	protected String getConnectionUrl() {
-		return "jdbc:h2:./stockinfodb";
+		// return "jdbc:h2:./stockinfo";
+		return "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1";
 	}
 
 	public static void main(String[] args) {

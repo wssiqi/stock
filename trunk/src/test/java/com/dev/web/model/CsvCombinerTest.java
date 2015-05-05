@@ -39,7 +39,7 @@ public class CsvCombinerTest {
 
 	@Test
 	public void testCombineTwoCsvFile() {
-		File csvFolder = new File("FundFlowCsv");
+		File csvFolder = new File("FundFlowCsv1");
 		List<File> fileList = new ArrayList<File>((int) csvFolder.length());
 		for (File csvFile : csvFolder.listFiles()) {
 			fileList.add(csvFile);
@@ -49,7 +49,7 @@ public class CsvCombinerTest {
 		};
 		csvCombiner.setCharsetForRead(Charset.forName("GBK"));
 		csvCombiner.setCharsetForWrite(Charset.forName("GBK"));
-		csvCombiner.combine(fileList, new File("fundflow.csv"));
+		csvCombiner.combine(fileList, new File("fundflow1.csv"));
 	}
 
 	// @Test

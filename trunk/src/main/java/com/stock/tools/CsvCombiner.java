@@ -76,7 +76,7 @@ public class CsvCombiner {
 			BufferedWriter bufferWriter) throws IOException {
 		String line = null;
 		while ((line = bufferReader.readLine()) != null) {
-			if (StringUtils.trim(line).isEmpty()) {
+			if (StringUtils.trim(line).isEmpty() || line.contains("没有相关")) {
 				continue;
 			}
 			bufferWriter.write(line);

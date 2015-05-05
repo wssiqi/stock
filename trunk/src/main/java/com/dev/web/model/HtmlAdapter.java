@@ -3,7 +3,9 @@ package com.dev.web.model;
 import java.io.File;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -12,6 +14,23 @@ import com.dev.web.CommUtils;
 
 public class HtmlAdapter {
 
+	private Map<String, String> colMapping = new HashMap<String, String>();
+	{
+		colMapping.put("股票代码", "CODE");
+		colMapping.put("日期", "DATE");
+		colMapping.put("收盘价", "EPRICE");
+		colMapping.put("涨跌幅", "RATE");
+		colMapping.put("主力净流入净额", "MAININ");
+		colMapping.put("主力净流入净占比", "MAININRATE");
+		colMapping.put("超大单净流入净额", "HUGEIN");
+		colMapping.put("超大单净流入净占比", "HUGEINRATE");
+		colMapping.put("大单净流入净额", "BIGIN");
+		colMapping.put("大单净流入净占比", "BIGINRATE");
+		colMapping.put("中单净流入净额", "MIDIN");
+		colMapping.put("中单净流入净占比", "MIDINRATE");
+		colMapping.put("小单净流入净额", "SMALLIN");
+		colMapping.put("小单净流入净占比", "SMALLINRATE");
+	}
 	private String stockId;
 
 	public void setHtmlFile(File htmlFile) {
@@ -36,12 +55,13 @@ public class HtmlAdapter {
 
 	public void beforeParseColumnName(Elements columnNameElements,
 			CsvResultSet resultSet) {
-		resultSet.addColumn("股票代码");
+		resultSet.addColumn(getNameInTable("股票代码"));
 
 		Elements copy = columnNameElements.clone();
 		Elements rowSpan = copy.select("th[rowspan]");
 		for (Element columnNameElement : rowSpan) {
-			resultSet.addColumn(CommUtils.trim(columnNameElement.text()));
+			String nameInPage = CommUtils.trim(columnNameElement.text());
+			resultSet.addColumn(getNameInTable(nameInPage));
 		}
 
 		Elements categorys = copy.select("th[colspan]");
@@ -52,11 +72,15 @@ public class HtmlAdapter {
 		for (int i = 0; i < categorys.size(); i++) {
 			Element category = categorys.get(i);
 			String prefix = CommUtils.trim(category.text());
-			resultSet.addColumn(prefix
-					+ CommUtils.trim(other.get(otherIndex++).text()));
-			resultSet.addColumn(prefix
-					+ CommUtils.trim(other.get(otherIndex++).text()));
+			resultSet.addColumn(getNameInTable(prefix
+					+ CommUtils.trim(other.get(otherIndex++).text())));
+			resultSet.addColumn(getNameInTable(prefix
+					+ CommUtils.trim(other.get(otherIndex++).text())));
 		}
+	}
+
+	private String getNameInTable(String nameInPage) {
+		return colMapping.get(nameInPage);
 	}
 
 	public String parseColumnName(Element element) {
@@ -69,10 +93,23 @@ public class HtmlAdapter {
 
 	public String parseCellValue(Element cellElement) {
 		String str = CommUtils.trim(cellElement.text());
-		int indexOf = str.indexOf('万');
-		if (indexOf != -1) {
-			return String.valueOf(new BigDecimal(str.replaceAll("万", ""))
+		int indexOfPercent = str.lastIndexOf('%');
+		if (indexOfPercent != -1) {
+			str = str.substring(0, indexOfPercent);
+		}
+		int indexOf1E4 = str.lastIndexOf('万');
+		if (indexOf1E4 != -1) {
+			return String.valueOf(new BigDecimal(str.substring(0, indexOf1E4))
 					.multiply(new BigDecimal(10000)));
+		}
+		int indexOf1E8 = str.lastIndexOf('亿');
+		if (indexOf1E8 != -1) {
+			return String.valueOf(new BigDecimal(str.substring(0, indexOf1E8))
+					.multiply(new BigDecimal(100000000)));
+		}
+
+		if ("-".equals(str)) {
+			str = "0";
 		}
 		return str;
 	}
