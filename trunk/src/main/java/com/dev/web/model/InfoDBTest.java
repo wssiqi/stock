@@ -1,8 +1,5 @@
 package com.dev.web.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Test;
 
 import com.dev.web.DBTable;

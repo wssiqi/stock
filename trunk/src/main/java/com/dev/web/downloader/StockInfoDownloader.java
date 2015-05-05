@@ -6,7 +6,6 @@ import java.net.URL;
 import java.util.List;
 
 import com.dev.web.StockException;
-import com.dev.web.model.Stocks;
 
 public class StockInfoDownloader extends Downloader {
 

@@ -3,7 +3,6 @@ package com.dev.web.downloader;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 
 import com.dev.web.StockException;

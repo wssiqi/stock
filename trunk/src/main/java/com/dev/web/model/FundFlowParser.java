@@ -13,7 +13,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.dev.web.CommUtils;
-import com.dev.web.DBTable;
 import com.dev.web.StockException;
 
 public abstract class FundFlowParser {
@@ -28,7 +27,7 @@ public abstract class FundFlowParser {
 			}
 			SimpleResultSet resultSet = FundFlowParser.parse(file);
 			String nameWithoutExtension = CommUtils
-					.getFileNameWithoutExtension(file);
+					.getNameWithoutExtension(file);
 			File outCsvFile = new File(csvFilesDir, nameWithoutExtension
 					+ ".csv");
 			System.out.println(file);
@@ -65,7 +64,7 @@ public abstract class FundFlowParser {
 				Elements cellElements = tableRowElement.select("td");
 				ArrayList<String> tableRow = new ArrayList<String>();
 				String stockId = CommUtils
-						.getFileNameWithoutExtension(fundFlowPageFile);
+						.getNameWithoutExtension(fundFlowPageFile);
 				tableRow.add("'" + stockId);
 				for (int j = 0; j < cellElements.size(); j++) {
 					Element cellElement = cellElements.get(j);

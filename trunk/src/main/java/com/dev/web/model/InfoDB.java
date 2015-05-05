@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.sql.ResultSet;
-import java.util.Arrays;
-import java.util.List;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.log4j.Logger;
