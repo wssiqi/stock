@@ -16,6 +16,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import com.dev.web.CommUtils;
 import com.dev.web.StockException;
@@ -73,28 +75,24 @@ public abstract class Downloader {
 	}
 
 	public void download() {
-		ExecutorService newFixedThreadPool = Executors.newFixedThreadPool(10);
-		List<Future<File>> futureList = new ArrayList<Future<File>>();
+		ExecutorService threadPool = Executors.newFixedThreadPool(10);
+		List<Future<?>> taskResultList = new ArrayList<Future<?>>();
 		for (String stockId : stockIdList) {
 			URL downloadUrl = makeDownloadUrl(stockId);
 			File saveToFilename = makeSaveToFile(stockId);
-			Future<File> future = newFixedThreadPool.submit(new DownloadThread(
-					downloadUrl, saveToFilename));
-			futureList.add(future);
+			Future<?> future = threadPool.submit(new DownloadRunnable(
+					downloadUrl, stockId));
+			taskResultList.add(future);
 		}
-		newFixedThreadPool.shutdown();
-		for (Future<File> future : futureList) {
+
+		threadPool.shutdown();
+		for (Future<?> future : taskResultList) {
 			try {
-				File file = future.get();
-				System.out.println(file.getAbsolutePath());
+				future.get();
 			} catch (Exception e) {
 				Logger.getLogger(getClass()).error(e.getMessage(), e);
-				newFixedThreadPool.shutdownNow();
-				try {
-					newFixedThreadPool.awaitTermination(1, TimeUnit.DAYS);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
+				List<Runnable> neverExecuteTasks = threadPool.shutdownNow();
+				
 				throw new RuntimeException(e);
 			}
 		}
@@ -107,53 +105,30 @@ public abstract class Downloader {
 
 	protected abstract URL makeDownloadUrl(String stockId);
 
-	static class DownloadThread implements Callable<File> {
+	protected abstract String afterDownload(Document htmlDoc);
+
+	static class DownloadRunnable implements Runnable {
 
 		private final URL downloadUrl;
-		private final File saveToFile;
-		private Exception lastException;
+		private final String stockId;
 
-		public DownloadThread(URL downloadUrl, File saveToFile) {
+		public DownloadRunnable(URL downloadUrl, String stockId) {
 			this.downloadUrl = downloadUrl;
-			this.saveToFile = saveToFile;
+			this.stockId = stockId;
 		}
 
-		public File call() throws Exception {
-			if (!saveToFile.exists()) {
-				int retryTimes = 2;
-				while (retryTimes-- > 0) {
-					if (successfulDownloadUrlToFile()) {
-						break;
-					}
-				}
-				if (lastException != null) {
-					throw new StockException(String.format(
-							"Download '%s' failed!", downloadUrl),
-							lastException);
-				}
-			}
-			return saveToFile;
+		public String getStockId() {
+			return stockId;
 		}
 
-		private boolean successfulDownloadUrlToFile() {
-			lastException = null;
-			InputStream in = null;
-			OutputStream out = null;
+		public void run() {
 			try {
-				URLConnection openConnection = downloadUrl.openConnection();
-				openConnection.setConnectTimeout(2000);
-				openConnection.setReadTimeout(20000);
-				in = openConnection.getInputStream();
-				out = new FileOutputStream(saveToFile);
-				IOUtils.copy(in, out);
-				return true;
+				Document doc = Jsoup.parse(downloadUrl, 10000);
+				System.out.println(doc.outerHtml());
 			} catch (Exception e) {
-				this.lastException = e;
-			} finally {
-				IOUtils.closeQuietly(in);
-				IOUtils.closeQuietly(out);
+				throw new RuntimeException(e);
 			}
-			return false;
 		}
+
 	}
 }

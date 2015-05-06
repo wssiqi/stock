@@ -46,14 +46,14 @@ public class DateUtils {
 
 	public static Date getCurrentDatetimeGMT8() {
 		try {
-			URL url = new URL("http://m.baidu.com");
-			URLConnection urlConnection = url.openConnection();
-			SimpleDateFormat dateFormatForBaidu = new SimpleDateFormat(
-					"EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-			String dateHeaderField = urlConnection.getHeaderFields()
-					.get("Date").get(0);
-			Date date = dateFormatForBaidu.parse(dateHeaderField);
-			return date;
+//			URL url = new URL("http://m.baidu.com");
+//			URLConnection urlConnection = url.openConnection();
+//			SimpleDateFormat dateFormatForBaidu = new SimpleDateFormat(
+//					"EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+//			String dateHeaderField = urlConnection.getHeaderFields()
+//					.get("Date").get(0);
+//			Date date = dateFormatForBaidu.parse(dateHeaderField);
+			return new Date();
 		} catch (Exception e) {
 			return new Date();
 		}
