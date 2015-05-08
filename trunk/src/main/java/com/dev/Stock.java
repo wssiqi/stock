@@ -9,8 +9,15 @@ public class Stock {
     public String maket;
 
     public boolean isValid() {
-        return !StringUtils.isEmpty(code) && !StringUtils.isEmpty(name) && !StringUtils.isEmpty(maket)
-                && code.matches("[603].+");
+        if (StringUtils.isEmpty(code) || StringUtils.isEmpty(name) || StringUtils.isEmpty(maket)) {
+            return false;
+        }
+
+        boolean isSHA = code.startsWith("600") || code.startsWith("601") || code.startsWith("603");
+        boolean isSZA = code.startsWith("000") || code.startsWith("002");
+
+        boolean isExit = code.contains("ST") || code.contains("退市");
+        return !isExit && (isSHA || isSZA);
     }
 
     @Override
