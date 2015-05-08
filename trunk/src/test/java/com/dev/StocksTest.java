@@ -12,7 +12,7 @@ public class StocksTest {
         File saveDir = new File("out");
         Logger.getLogger(getClass()).info(saveDir.mkdirs());
 //        Downloader.downloadFundFlow(saveDir);
-        Downloader.downloadFundFlowToday(saveDir);
+        Downloader.downloadRealtimeFundFlow(saveDir);
     }
 
 }

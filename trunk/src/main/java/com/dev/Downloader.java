@@ -3,9 +3,7 @@ package com.dev;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -17,35 +15,31 @@ import org.jsoup.select.Elements;
 
 public class Downloader {
 
+    private static final Logger LOGGER = Logger.getLogger(Downloader.class);
+
     static {
-        // System.setProperty("http.proxyHost", "10.144.1.10");
-        // System.setProperty("http.proxyPort", "8080");
+        System.setProperty("http.proxyHost", "10.144.1.10");
+        System.setProperty("http.proxyPort", "8080");
     }
     private static final char CSV_SEPERATOR = ',';
 
-    private static Map<Character, String> PREFIX_MAP = new HashMap<Character, String>();
-    static {
-        PREFIX_MAP.put('0', "1");
-        PREFIX_MAP.put('3', "1");
-        PREFIX_MAP.put('6', "0");
-    }
+    private static List<Stock> stockList;
 
-    public static void downloadFundFlowToday(File saveDir) throws Exception {
+    public static void downloadRealtimeFundFlow(File saveDir) throws Exception {
         StringBuffer out = new StringBuffer();
         out.append("code,name,price,rate,in,inrate,in0,rate0,in1,rate1,in2,rate2,in3,rate3");
-
-        List<Stock> stockList = Stocks.getStockList();
+        stockList = Stocks.getStockList();
         for (int i = 0; i < stockList.size(); i++) {
             Stock stock = Stocks.getStockList().get(i);
             Document html = downloadHtml(stock, String.format("http://data.eastmoney.com/zjlx/%s.html", stock.code));
             Elements rows = html.select("div.flash-data-cont ul");
             if (rows.size() < 5) {
-                Logger.getLogger(Downloader.class).info("Skip " + stock.toString() + " no data");
+                LOGGER.info("Skip " + stock.toString() + " no data");
                 continue;
             }
             appendNewLine(out);
             appendStockCodeAndName(out, stock);
-            appendStockCurrentPriceAndRate(out, stock);
+            appendStockPriceAndRateToday(out, stock);
             for (Element row : rows) {
                 appendStockTodayFlowData(out, row);
             }
@@ -54,23 +48,35 @@ public class Downloader {
                 File saveFile = new File(saveDir, Utils.getDateTime() + ".csv");
                 saveToFile(out, saveFile);
             }
-
         }
     }
 
-    private static void appendStockCurrentPriceAndRate(StringBuffer out, Stock stock) {
+    private static void appendStockPriceAndRateToday(StringBuffer out, Stock stock) {
         try {
-            Document htmlDoc = downloadHtml(
-                    stock,
-                    String.format("http://3g.163.com/3gstock/quotes/stock/%s%s.html",
-                            PREFIX_MAP.get(stock.code.charAt(0)), stock.code));
-            String text = htmlDoc.select("div.content span").get(1).text();
-            text = StringUtils.trim(text);
-            out.append(CSV_SEPERATOR).append(Utils.translateToNum(text.substring(0, text.indexOf('('))));
+            Document htmlDoc = downloadHtml(stock, String.format("http://3g.163.com/3gstock/quotes/stock/%s%s.html",
+                    getStockIdPrefixHardCodeBy163(stock), stock.code));
+            String priceAndRate = htmlDoc.select("div.content span").get(1).text();
+            priceAndRate = StringUtils.trim(priceAndRate);
             out.append(CSV_SEPERATOR)
-                    .append(Utils.translateToNum(text.substring(text.indexOf(')') + 1, text.length())));
+                    .append(Utils.translateToNum(priceAndRate.substring(0, priceAndRate.indexOf('('))));
+            out.append(CSV_SEPERATOR).append(
+                    Utils.translateToNum(priceAndRate.substring(priceAndRate.indexOf(')') + 1, priceAndRate.length())));
         } catch (Exception e) {
-            Logger.getLogger(Downloader.class).error("Get price and rate failed " + stock, e);
+            LOGGER.error("Get price and rate failed " + stock, e);
+        }
+    }
+
+    private static String getStockIdPrefixHardCodeBy163(Stock stock) {
+        char firstChar = stock.code.charAt(0);
+        switch (firstChar) {
+        case '0':
+        case '3':
+            return "1";
+        case '6':
+            return "0";
+        default:
+            throw new IllegalArgumentException(String.format("Stock code should start with 0/3/6, but current is <%s>",
+                    stock.toString()));
         }
     }
 
@@ -91,7 +97,7 @@ public class Downloader {
             Document html = downloadHtml(stock, String.format("http://data.eastmoney.com/zjlx/%s.html", stock.code));
             Elements rows = html.select("table.tab1 tbody tr");
             if (rows.size() < 10) {
-                Logger.getLogger(Downloader.class).info("Skip " + stock.toString() + " no data");
+                LOGGER.info("Skip " + stock.toString() + " no data");
                 continue;
             }
             for (Element row : rows) {
@@ -112,10 +118,10 @@ public class Downloader {
         Document html = null;
         do {
             try {
-                Logger.getLogger(Downloader.class).info("Downloading... " + stock.code);
+                LOGGER.info("Downloading... " + stock.code);
                 html = Jsoup.parse(new URL(url), 3000);
             } catch (Exception e) {
-                Logger.getLogger(Downloader.class).info("Wait 30 seconds...");
+                LOGGER.info("Wait 30 seconds...");
                 Thread.sleep(30000);
             }
         } while (html == null);
@@ -141,6 +147,6 @@ public class Downloader {
 
     private static void saveToFile(StringBuffer out, File saveFile) throws IOException {
         FileUtils.write(saveFile, out, "GBK");
-        Logger.getLogger(Downloader.class).info("save to disk");
+        LOGGER.info("save to disk");
     }
 }
