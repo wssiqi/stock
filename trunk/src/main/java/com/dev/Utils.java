@@ -1,7 +1,9 @@
 package com.dev;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,8 +12,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
-public class Utils {
-    private static Map<Character, BigDecimal> NUM_UNIT = new HashMap<Character, BigDecimal>();
+public abstract class Utils {
+    static Map<Character, BigDecimal> NUM_UNIT = new HashMap<Character, BigDecimal>();
     static {
         NUM_UNIT.put('-', new BigDecimal("0"));
         NUM_UNIT.put('%', new BigDecimal("1"));
@@ -57,4 +59,7 @@ public class Utils {
         return digitDecimal.multiply(unitDecimal).toString();
     }
 
+    public static String getDateTime() {
+        return new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+    }
 }
