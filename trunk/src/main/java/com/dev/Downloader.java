@@ -23,15 +23,16 @@ public class Downloader {
         for (int i = 0; i < stockList.size(); i++) {
             Stock stock = Stocks.getStockList().get(i);
             Document html = downloadFundFlowHtml(stock);
-            Elements rows = html.select("table.tab1 tbody tr");
-            if (rows.size() < 10) {
+            Elements rows = html.select("div.flash-data-cont ul");
+            if (rows.size() < 5) {
                 Logger.getLogger(Downloader.class).info("Skip " + stock.toString() + " no data");
                 continue;
             }
+            appendNewLine(out);
+            appendStockCodeAndName(out, stock);
+            appendStockCurrentPriceAndRate(out,stock);
             for (Element row : rows) {
-                appendNewLine(out);
-                appendStockCodeAndName(out, stock);
-                appendStockOtherInfo(out, row);
+                appendStockTodayFlowData(out, row);
             }
 
             if (i++ % 10 == 0) {
@@ -39,6 +40,18 @@ public class Downloader {
                 saveToFile(out, saveFile);
             }
 
+        }
+    }
+
+    private static void appendStockCurrentPriceAndRate(StringBuffer out, Stock stock) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    private static void appendStockTodayFlowData(StringBuffer out, Element row) {
+        Elements datas = row.select("li.data-val span");
+        for (Element data : datas) {
+            out.append(CSV_SEPERATOR).append(Utils.translateToNum(data.text()));
         }
     }
 
@@ -57,7 +70,7 @@ public class Downloader {
             for (Element row : rows) {
                 appendNewLine(out);
                 appendStockCodeAndName(out, stock);
-                appendStockOtherInfo(out, row);
+                appendStockHistoryFlowData(out, row);
             }
 
             if (i++ % 10 == 0) {
@@ -92,7 +105,7 @@ public class Downloader {
         out.append(CSV_SEPERATOR).append(stock.name);
     }
 
-    private static void appendStockOtherInfo(StringBuffer out, Element row) {
+    private static void appendStockHistoryFlowData(StringBuffer out, Element row) {
         Elements datas = row.select("td");
         for (Element data : datas) {
             String text = data.text();
