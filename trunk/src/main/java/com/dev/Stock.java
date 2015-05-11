@@ -2,7 +2,7 @@ package com.dev;
 
 import org.apache.commons.lang.StringUtils;
 
-public class Stock {
+public class Stock implements Comparable<Stock> {
 
     public String code;
     public String name;
@@ -24,4 +24,14 @@ public class Stock {
     public String toString() {
         return "Stock [code=" + code + ", name=" + name + ", maket=" + maket + "]";
     }
+
+    public int compareTo(Stock o) {
+        if (code == null) {
+            return o.code == null ? 0 : -1;
+        } else if (o.code == null) {
+            return 1;
+        }
+        return code.compareTo(o.code);
+    }
+
 }

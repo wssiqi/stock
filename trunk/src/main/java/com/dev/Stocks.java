@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -35,13 +36,14 @@ public class Stocks {
                 if (!stock.isValid()) {
                     continue;
                 }
-                stockList.add(stock); 
+                stockList.add(stock);
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             IOUtils.closeQuietly(in);
         }
+        Collections.sort(stockList);
         return stockList;
     }
 

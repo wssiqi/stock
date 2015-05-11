@@ -2,8 +2,17 @@ package com.dev;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy.Type;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -13,39 +22,56 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.dev.Proxys.Proxy;
+
 public class Downloader {
+
+    private static final String CSVNAME = Utils.getDateTime() + ".csv";
 
     private static final Logger LOGGER = Logger.getLogger(Downloader.class);
 
     static {
-        System.setProperty("http.proxyHost", "10.144.1.10");
-        System.setProperty("http.proxyPort", "8080");
+        // System.setProperty("http.proxyHost", "10.144.1.10");
+        // System.setProperty("http.proxyPort", "8080");
     }
     private static final char CSV_SEPERATOR = ',';
 
     private static List<Stock> stockList;
 
     public static void downloadRealtimeFundFlow(File saveDir) throws Exception {
-        StringBuffer out = new StringBuffer();
-        out.append("code,name,price,rate,in,inrate,in0,rate0,in1,rate1,in2,rate2,in3,rate3");
-        stockList = Stocks.getStockList();
-        for (int i = 0; i < stockList.size(); i++) {
-            Stock stock = Stocks.getStockList().get(i);
-            Document html = downloadHtml(stock, String.format("http://data.eastmoney.com/zjlx/%s.html", stock.code));
-            Elements rows = html.select("div.flash-data-cont ul");
-            if (rows.size() < 5) {
-                LOGGER.info("Skip " + stock.toString() + " no data");
-                continue;
-            }
-            appendNewLine(out);
-            appendStockCodeAndName(out, stock);
-            appendStockPriceAndRateToday(out, stock);
-            for (Element row : rows) {
-                appendStockTodayFlowData(out, row);
-            }
+        ExecutorService pool = Executors.newFixedThreadPool(10);
 
-            if (i++ % 20 == 0) {
-                File saveFile = new File(saveDir, Utils.getDateTime() + ".csv");
+        stockList = Stocks.getStockList();
+        List<Future<StringBuffer>> futureList = new ArrayList<Future<StringBuffer>>();
+        for (int i = 0; i < stockList.size(); i++) {
+            final Stock stock = stockList.get(i);
+            Future<StringBuffer> future = pool.submit(new Callable<StringBuffer>() {
+                public StringBuffer call() throws Exception {
+                    StringBuffer out = new StringBuffer();
+                    Document html = downloadHtml(stock,
+                            String.format("http://data.eastmoney.com/zjlx/%s.html", stock.code));
+                    Elements rows = html.select("div.flash-data-cont ul");
+                    if (rows.size() >= 5) {
+                        appendNewLine(out);
+                        appendStockCodeAndName(out, stock);
+                        appendStockPriceAndRateToday(out, stock);
+                        for (Element row : rows) {
+                            appendStockTodayFlowData(out, row);
+                        }
+                    }
+                    return out;
+                }
+            });
+            futureList.add(future);
+        }
+        pool.shutdown();
+
+        StringBuffer out = new StringBuffer();
+        out.append("c,n,p,r,i0,r0,i1,r1,i2,r2,i3,r3,i4,r4");
+        for (int i = 0; i < futureList.size(); i++) {
+            out.append(futureList.get(i).get());
+            if (i % 20 == 0) {
+                File saveFile = new File(saveDir, CSVNAME);
                 saveToFile(out, saveFile);
             }
         }
@@ -107,22 +133,32 @@ public class Downloader {
             }
 
             if (i++ % 10 == 0) {
-                File saveFile = new File(saveDir, Utils.getDateTime() + ".csv");
+                File saveFile = new File(saveDir, CSVNAME);
                 saveToFile(out, saveFile);
             }
 
         }
     }
 
-    private static Document downloadHtml(Stock stock, String url) throws InterruptedException {
+    private static Document downloadHtml(Stock stock, String url) throws Exception {
         Document html = null;
+        URLConnection conn = new URL(url).openConnection();
+        List<Proxy> proxyList = new LinkedList<Proxys.Proxy>(Proxys.PROXYLIST);
+        int i = 0;
+        LOGGER.info("Downloading... " + stock.code);
+        long s = System.currentTimeMillis();
         do {
             try {
-                LOGGER.info("Downloading... " + stock.code);
-                html = Jsoup.parse(new URL(url), 3000);
+                conn.setConnectTimeout(1000);
+                conn.setReadTimeout(3000);
+                html = Jsoup.parse(conn.getInputStream(), null, "");
+                LOGGER.info("Downloaded... " + stock.code + " use " + (System.currentTimeMillis() - s) + "ms");
             } catch (Exception e) {
-                LOGGER.info("Wait 30 seconds...");
-                Thread.sleep(30000);
+                i = i % proxyList.size();
+                Proxy poll = proxyList.get(i);
+                conn = new URL(url).openConnection(new java.net.Proxy(Type.HTTP, new InetSocketAddress(poll.ip, Integer
+                        .valueOf(poll.port))));
+                i++;
             }
         } while (html == null);
         return html;
