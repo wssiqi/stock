@@ -36,12 +36,10 @@ public class Downloader {
     }
     private static final char CSV_SEPERATOR = ',';
 
-    private static List<Stock> stockList;
+    private static List<Stock> stockList = Stocks.getStockList();;
 
     public static void downloadRealtimeFundFlow(File saveDir) throws Exception {
         ExecutorService pool = Executors.newFixedThreadPool(10);
-
-        stockList = Stocks.getStockList();
         List<Future<StringBuffer>> futureList = new ArrayList<Future<StringBuffer>>();
         for (int i = 0; i < stockList.size(); i++) {
             final Stock stock = stockList.get(i);
@@ -75,6 +73,7 @@ public class Downloader {
                 saveToFile(out, saveFile);
             }
         }
+        saveToFile(out, new File(saveDir, CSVNAME));
     }
 
     private static void appendStockPriceAndRateToday(StringBuffer out, Stock stock) {
@@ -114,30 +113,48 @@ public class Downloader {
     }
 
     public static void downloadFundFlow(File saveDir) throws Exception {
-        StringBuffer out = new StringBuffer();
-        out.append("code,name,date,price,rate,in,inrate,in0,rate0,in1,rate1,in2,rate2,in3,rate3");
+        ExecutorService pool = Executors.newFixedThreadPool(10);
+        List<Future<StringBuffer>> futureList = new ArrayList<Future<StringBuffer>>();
+        File saveFile = new File(saveDir, CSVNAME);
 
-        List<Stock> stockList = Stocks.getStockList();
         for (int i = 0; i < stockList.size(); i++) {
-            Stock stock = Stocks.getStockList().get(i);
-            Document html = downloadHtml(stock, String.format("http://data.eastmoney.com/zjlx/%s.html", stock.code));
-            Elements rows = html.select("table.tab1 tbody tr");
-            if (rows.size() < 10) {
-                LOGGER.info("Skip " + stock.toString() + " no data");
-                continue;
-            }
-            for (Element row : rows) {
-                appendNewLine(out);
-                appendStockCodeAndName(out, stock);
-                appendStockHistoryFlowData(out, row);
-            }
-
-            if (i++ % 10 == 0) {
-                File saveFile = new File(saveDir, CSVNAME);
-                saveToFile(out, saveFile);
-            }
-
+            final Stock stock = stockList.get(i);
+            Future<StringBuffer> future = pool.submit(new Callable<StringBuffer>() {
+                public StringBuffer call() throws Exception {
+                    StringBuffer out = new StringBuffer();
+                    try {
+                        Document html = downloadHtml(stock,
+                                String.format("http://data.eastmoney.com/zjlx/%s.html", stock.code));
+                        Elements rows = html.select("table.tab1 tbody tr");
+                        if (rows.size() >= 10) {
+                            for (Element row : rows) {
+                                appendNewLine(out);
+                                appendStockCodeAndName(out, stock);
+                                appendStockHistoryFlowData(out, row);
+                            }
+                        }
+                        return out;
+                    } catch (Exception e) {
+                        LOGGER.error("Parse " + stock + " failed.", e);
+                        return new StringBuffer();
+                    }
+                }
+            });
+            futureList.add(future);
         }
+        pool.shutdown();
+
+        StringBuffer result = new StringBuffer();
+        result.append("c,n,d,p,r,i0,r0,i1,r1,i2,r2,i3,r3,i4,r4");
+        for (int i = 0; i < futureList.size(); i++) {
+            Future<StringBuffer> future = futureList.get(i);
+            result.append(future.get());
+            if (i % 10 == 0) {
+                saveToFile(result, saveFile);
+            }
+        }
+
+        saveToFile(result, saveFile);
     }
 
     private static Document downloadHtml(Stock stock, String url) throws Exception {

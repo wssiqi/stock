@@ -11,7 +11,7 @@ public class StocksTest {
     public void testGetAllStocks() throws Exception {
         File saveDir = new File("out");
         Logger.getLogger(getClass()).info(saveDir.mkdirs());
-        // Downloader.downloadFundFlow(saveDir);
+//         Downloader.downloadFundFlow(saveDir);
         Downloader.downloadRealtimeFundFlow(saveDir);
     }
 
